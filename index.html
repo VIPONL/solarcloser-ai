@@ -107,4 +107,59 @@ body{font-family:'DM Sans',sans-serif;background:var(--sky);color:var(--text)}
 <div id="root"></div>
 <script type="text/babel">
 const {useState} = React;
-const leads=[{name:"James Whitfield",location:"Phoenix, AZ",bill:"$320/mo",system:"10.4 kW",score:"hot",status:"sent",value:"$28,500
+const leads=[{name:"James Whitfield",location:"Phoenix, AZ",bill:"$320/mo",system:"10.4 kW",score:"hot",status:"sent",value:"$28,500location:"Phoenix, AZ",bill:"$320/mo",system:"10.4 kW",score:"hot",status:"sent",value:"$28,500"},{name:"Maria Sandoval",location:"San Diego, CA",bill:"$280/mo",system:"8.8 kW",score:"hot",status:"closed",value:"$24,000"},{name:"Tom Gallagher",location:"Austin, TX",bill:"$210/mo",system:"7.2 kW",score:"warm",status:"sent",value:"$19,800"},{name:"Priya Nair",location:"Las Vegas, NV",bill:"$390/mo",system:"13.6 kW",score:"hot",status:"sent",value:"$36,200"},{name:"Derek Olsen",location:"Denver, CO",bill:"$170/mo",system:"5.6 kW",score:"warm",status:"sent",value:"$15,400"},{name:"Fiona Walsh",location:"Tampa, FL",bill:"$140/mo",system:"4.8 kW",score:"cold",status:"sent",value:"$13,100"}];
+const pipeline={"New Lead":[{name:"Alex Kim",detail:"Residential · 12kW",value:"$32k"},{name:"Brenda Moore",detail:"Commercial · 25kW",value:"$68k"}],"Proposal Sent":[{name:"James Whitfield",detail:"Residential · 10.4kW",value:"$28.5k"},{name:"Priya Nair",detail:"Residential · 13.6kW",value:"$36.2k"}],"Negotiating":[{name:"Derek Olsen",detail:"Residential · 5.6kW",value:"$15.4k"}],"Closed Won":[{name:"Maria Sandoval",detail:"Residential · 8.8kW",value:"$24k"},{name:"R. Chapman",detail:"Commercial · 40kW",value:"$108k"}]};
+const bars=[{l:"Jan",v:62},{l:"Feb",v:45},{l:"Mar",v:78},{l:"Apr",v:91},{l:"May",v:85},{l:"Jun",v:55}];
+function getAI(msg){const m=msg.toLowerCase();if(m.includes("sav"))return"You could save $1,200-$1,800 annually. Over 25 years that is $30,000-$45,000.";if(m.includes("batter"))return"A 10kWh battery adds $8,000-$12,000 and is great for outages or time-of-use pricing.";if(m.includes("payback"))return"Average payback is 6-8 years. With the 30% federal tax credit many see 4-6 years.";return"I can help with savings, system sizing, battery advice, and payback. What would you like to know?";}
+function App(){
+const [nav,setNav]=React.useState("dashboard");
+const [form,setForm]=React.useState({name:"",bill:"",battery:"no"});
+const [result,setResult]=React.useState(null);
+const [gen,setGen]=React.useState(false);
+const [msgs,setMsgs]=React.useState([{r:"ai",t:"Hi! I am your Solar AI Assistant. Ask me anything about solar savings, batteries, or payback periods."}]);
+const [inp,setInp]=React.useState("");
+const [chatLoad,setChatLoad]=React.useState(false);
+function generate(){if(!form.name||!form.bill)return;setGen(true);setResult(null);setTimeout(()=>{const b=parseFloat(form.bill)||200;const kw=((b/0.13)/30/4.5).toFixed(1);const cost=(kw*2800).toFixed(0);const sav=(b*0.85*12).toFixed(0);const pay=(cost/sav).toFixed(1);const prod=(kw*4.5*365).toFixed(0);setResult({kw,cost:parseInt(cost).toLocaleString(),sav:parseInt(sav).toLocaleString(),pay,prod});setGen(false);},1800);}
+function send(){if(!inp.trim())return;const m=inp;setInp("");setMsgs(p=>[...p,{r:"user",t:m}]);setChatLoad(true);setTimeout(()=>{setMsgs(p=>[...p,{r:"ai",t:getAI(m)}]);setChatLoad(false);},1200);}
+return React.createElement("div",{className:"app"},
+React.createElement("aside",{className:"sidebar"},
+React.createElement("div",{className:"logo"},React.createElement("span",null,"☀️"),React.createElement("div",null,"SolarCloser AI",React.createElement("span",{className:"logo-sub"},"Sales Platform"))),
+React.createElement("nav",{className:"nav"},
+React.createElement("div",{className:"nav-section"},"Main"),
+[{id:"dashboard",icon:"⬛",label:"Dashboard"},{id:"leads",icon:"👥",label:"Leads"},{id:"proposals",icon:"⚡",label:"Proposals"},{id:"pipeline",icon:"📊",label:"Pipeline"},{id:"assistant",icon:"🤖",label:"AI Assistant"}].map(i=>React.createElement("div",{key:i.id,className:"nav-item"+(nav===i.id?" nav-active":""),onClick:()=>setNav(i.id)},i.icon," ",i.label))
+),
+React.createElement("div",{className:"footer"},React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},React.createElement("div",{className:"avatar"},"JS"),React.createElement("div",null,React.createElement("div",{style:{fontSize:"0.8rem",fontWeight:600}},"Jake Sullivan"),React.createElement("div",{style:{fontSize:"0.65rem",color:"var(--sun)"}},"Growth Plan"))))
+),
+React.createElement("main",{className:"main"},
+nav==="dashboard"&&React.createElement("div",null,
+React.createElement("div",{className:"page-header"},React.createElement("div",null,React.createElement("h1",{className:"page-title"},"Good morning, Jake ☀️"),React.createElement("p",{className:"page-sub"},"Here's what's happening with your solar sales today.")),React.createElement("button",{className:"btn btn-primary",onClick:()=>setNav("proposals")},"+ New Proposal")),
+React.createElement("div",{className:"stats-grid"},[{icon:"👥",label:"Total Leads",value:"48",change:"+12 this week",cls:"orange"},{icon:"⚡",label:"Proposals Sent",value:"31",change:"+5 this week",cls:"blue"},{icon:"🏆",label:"Deals Closed",value:"9",change:"+2 this week",cls:"green"},{icon:"💰",label:"Revenue MTD",value:"$214K",change:"+18% vs last month",cls:"orange"}].map((s,i)=>React.createElement("div",{key:i,className:"stat-card"},React.createElement("div",{className:"stat-icon"},s.icon),React.createElement("div",{className:"stat-label"},s.label),React.createElement("div",{className:"stat-value "+s.cls},s.value),React.createElement("div",{className:"stat-change"},"↑ ",s.change)))),
+React.createElement("div",{className:"card",style:{marginBottom:18}},React.createElement("div",{className:"card-title"},"Recent Leads"),React.createElement("table",{className:"table"},React.createElement("thead",null,React.createElement("tr",null,["Customer","Location","Bill","Score","Status","Value"].map(h=>React.createElement("th",{key:h,className:"th"},h)))),React.createElement("tbody",null,leads.slice(0,5).map((l,i)=>React.createElement("tr",{key:i,className:"tr"},React.createElement("td",{className:"td bold"},l.name),React.createElement("td",{className:"td muted"},l.location),React.createElement("td",{className:"td"},l.bill),React.createElement("td",{className:"td"},React.createElement("span",{className:"badge badge-"+l.score},l.score)),React.createElement("td",{className:"td"},React.createElement("span",{className:"badge badge-"+l.status},l.status)),React.createElement("td",{className:"td green bold"},l.value))))))
+),
+nav==="proposals"&&React.createElement("div",null,
+React.createElement("div",{className:"page-header"},React.createElement("div",null,React.createElement("h1",{className:"page-title"},"AI Proposal ",React.createElement("span",{className:"accent"},"Generator")),React.createElement("p",{className:"page-sub"},"Generate a solar proposal in under 60 seconds"))),
+React.createElement("div",{className:"grid2"},
+React.createElement("div",{className:"card"},
+React.createElement("div",{className:"card-title"},"Customer Details"),
+React.createElement("div",{className:"form-group"},React.createElement("label",{className:"form-label"},"Customer Name"),React.createElement("input",{className:"form-input",placeholder:"e.g. John Smith",value:form.name,onChange:e=>setForm({...form,name:e.target.value})})),
+React.createElement("div",{className:"form-group"},React.createElement("label",{className:"form-label"},"Monthly Bill ($)"),React.createElement("input",{className:"form-input",type:"number",placeholder:"e.g. 280",value:form.bill,onChange:e=>setForm({...form,bill:e.target.value})})),
+React.createElement("button",{className:"btn btn-primary",style:{width:"100%",padding:"12px"},onClick:generate,disabled:gen},gen?"Generating...":"⚡ Generate Proposal")
+),
+React.createElement("div",null,result?React.createElement("div",{className:"proposal-result"},React.createElement("h3",{style:{fontFamily:"Syne",fontWeight:700,color:"var(--sun)",marginBottom:14}},"☀️ Solar Proposal — ",form.name),[["System Size",result.kw+" kW",false],["Annual Production",parseInt(result.prod).toLocaleString()+" kWh",false],["System Cost","$"+result.cost,false],["Annual Savings","$"+result.sav,true],["Payback Period",result.pay+" years",false]].map(([l,v,h],i)=>React.createElement("div",{key:i,className:"proposal-metric"},React.createElement("span",{style:{color:"var(--muted)"}},l),React.createElement("span",{style:{fontWeight:600,color:h?"var(--green)":"var(--text)"}},v)))):React.createElement("div",{className:"card",style:{display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:10,minHeight:200,color:"var(--muted)"}},React.createElement("div",{style:{fontSize:"3rem"}},"⚡"),React.createElement("div",{style:{fontFamily:"Syne",fontWeight:700,color:"var(--text)"}},"Ready to Generate")))
+)
+),
+nav==="assistant"&&React.createElement("div",null,
+React.createElement("div",{className:"page-header"},React.createElement("div",null,React.createElement("h1",{className:"page-title"},"Solar AI ",React.createElement("span",{className:"accent"},"Assistant")),React.createElement("p",{className:"page-sub"},"Ask anything about solar savings, batteries, or payback"))),
+React.createElement("div",{className:"card",style:{padding:0,maxWidth:600}},
+React.createElement("div",{style:{padding:"14px 18px",borderBottom:"1px solid rgba(255,255,255,0.06)",display:"flex",alignItems:"center",gap:10}},React.createElement("div",{className:"chat-av chat-av-ai"},"☀️"),React.createElement("div",null,React.createElement("div",{style:{fontWeight:600,fontSize:"0.9rem"}},"SolarCloser Assistant"),React.createElement("div",{style:{fontSize:"0.7rem",color:"var(--green)"}},"● Online"))),
+React.createElement("div",{className:"chat-messages"},msgs.map((m,i)=>React.createElement("div",{key:i,className:"chat-msg"+(m.r==="user"?" chat-user":"")},React.createElement("div",{className:"chat-av "+(m.r==="ai"?"chat-av-ai":"chat-av-user")},m.r==="ai"?"☀️":"JS"),React.createElement("div",{className:"chat-bubble "+(m.r==="ai"?"chat-bubble-ai":"chat-bubble-user")},m.t))),chatLoad&&React.createElement("div",{className:"chat-msg"},React.createElement("div",{className:"chat-av chat-av-ai"},"☀️"),React.createElement("div",{className:"chat-bubble chat-bubble-ai"},"..."))),
+React.createElement("div",{className:"chat-input-row"},React.createElement("input",{className:"chat-input",placeholder:"Ask about savings, batteries, payback...",value:inp,onChange:e=>setInp(e.target.value),onKeyDown:e=>e.key==="Enter"&&send()}),React.createElement("button",{className:"btn-send",onClick:send},"Send"))
+)
+)
+)
+);}
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
+
